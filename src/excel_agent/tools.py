@@ -38,7 +38,7 @@ def _df_to_result(df: pd.DataFrame, limit: Optional[int] = None, select_columns:
 def _get_filter_mask(df: pd.DataFrame, column: str, operator: str, value: Any) -> pd.Series:
     """内部辅助函数：生成单个筛选条件的布尔掩码"""
     if column not in df.columns:
-        raise ValueError(f"列 '{column}' 不存在，可用列: {list(df.columns)}")
+        raise ValueError(f"Column '{column}' does not exist. Available columns: {list(df.columns)}")
     
     col = df[column]
     
@@ -69,7 +69,7 @@ def _get_filter_mask(df: pd.DataFrame, column: str, operator: str, value: Any) -
     elif operator == "endswith":
         return col.astype(str).str.endswith(str(value), na=False)
     else:
-        raise ValueError(f"不支持的运算符: {operator}")
+        raise ValueError(f"Unsupported operator: {operator}")
 
 
 @tool
@@ -125,12 +125,12 @@ def filter_data(
         # 3. 排序（如果指定了 sort_by）
         if sort_by:
             if sort_by not in result_df.columns:
-                return {"error": f"排序列 '{sort_by}' 不存在，可用列: {list(result_df.columns)}"}
+                return {"error": f"Sort column '{sort_by}' does not exist. Available columns: {list(result_df.columns)}"}
             result_df = result_df.sort_values(by=sort_by, ascending=ascending)
-        
+
         return _df_to_result(result_df, limit, select_columns)
     except Exception as e:
-        return {"error": f"筛选出错: {str(e)}"}
+        return {"error": f"Filter failed: {str(e)}"}
 
 
 @tool
@@ -165,10 +165,10 @@ def aggregate_data(
                     final_mask &= mask
             df = df[final_mask]
         except Exception as e:
-            return {"error": f"筛选条件错误: {str(e)}"}
-    
+            return {"error": f"Invalid filter conditions: {str(e)}"}
+
     if column not in df.columns:
-        return {"error": f"列 '{column}' 不存在，可用列: {list(df.columns)}"}
+        return {"error": f"Column '{column}' does not exist. Available columns: {list(df.columns)}"}
     
     col = df[column]
     
@@ -188,7 +188,7 @@ def aggregate_data(
         elif agg_func == "std":
             result = col.std()
         else:
-            return {"error": f"不支持的聚合函数: {agg_func}"}
+            return {"error": f"Unsupported aggregation function: {agg_func}"}
         
         # 处理 numpy 类型
         if hasattr(result, 'item'):
@@ -201,7 +201,7 @@ def aggregate_data(
             "result": result,
         }
     except Exception as e:
-        return {"error": f"聚合计算出错: {str(e)}"}
+        return {"error": f"Aggregation failed: {str(e)}"}
 
 
 @tool
@@ -240,12 +240,12 @@ def group_and_aggregate(
                     final_mask &= mask
             df = df[final_mask]
         except Exception as e:
-            return {"error": f"筛选条件错误: {str(e)}"}
-    
+            return {"error": f"Invalid filter conditions: {str(e)}"}
+
     if group_by not in df.columns:
-        return {"error": f"分组列 '{group_by}' 不存在，可用列: {list(df.columns)}"}
+        return {"error": f"Group-by column '{group_by}' does not exist. Available columns: {list(df.columns)}"}
     if agg_column not in df.columns:
-        return {"error": f"聚合列 '{agg_column}' 不存在，可用列: {list(df.columns)}"}
+        return {"error": f"Aggregate column '{agg_column}' does not exist. Available columns: {list(df.columns)}"}
     
     try:
         grouped = df.groupby(group_by)[agg_column].agg(agg_func).reset_index()
@@ -258,7 +258,7 @@ def group_and_aggregate(
         result["filtered_rows"] = len(df)
         return result
     except Exception as e:
-        return {"error": f"分组聚合出错: {str(e)}"}
+        return {"error": f"Group aggregation failed: {str(e)}"}
 
 
 @tool
@@ -297,16 +297,16 @@ def sort_data(
                     final_mask &= mask
             df = df[final_mask]
         except Exception as e:
-            return {"error": f"筛选条件错误: {str(e)}"}
-    
+            return {"error": f"Invalid filter conditions: {str(e)}"}
+
     if column not in df.columns:
-        return {"error": f"列 '{column}' 不存在，可用列: {list(df.columns)}"}
+        return {"error": f"Column '{column}' does not exist. Available columns: {list(df.columns)}"}
     
     try:
         sorted_df = df.sort_values(by=column, ascending=ascending)
         return _df_to_result(sorted_df, limit, select_columns)
     except Exception as e:
-        return {"error": f"排序出错: {str(e)}"}
+        return {"error": f"Sort failed: {str(e)}"}
 
 
 @tool
@@ -343,7 +343,7 @@ def search_data(
         result_df = df[mask]
         return _df_to_result(result_df, limit, select_columns)
     except Exception as e:
-        return {"error": f"搜索出错: {str(e)}"}
+        return {"error": f"Search failed: {str(e)}"}
 
 
 @tool
@@ -376,10 +376,10 @@ def get_column_stats(
                     final_mask &= mask
             df = df[final_mask]
         except Exception as e:
-            return {"error": f"筛选条件错误: {str(e)}"}
-    
+            return {"error": f"Invalid filter conditions: {str(e)}"}
+
     if column not in df.columns:
-        return {"error": f"列 '{column}' 不存在，可用列: {list(df.columns)}"}
+        return {"error": f"Column '{column}' does not exist. Available columns: {list(df.columns)}"}
     
     col = df[column]
     
@@ -404,7 +404,7 @@ def get_column_stats(
         
         return stats
     except Exception as e:
-        return {"error": f"统计出错: {str(e)}"}
+        return {"error": f"Stats failed: {str(e)}"}
 
 
 @tool
@@ -439,10 +439,10 @@ def get_unique_values(
                     final_mask &= mask
             df = df[final_mask]
         except Exception as e:
-            return {"error": f"筛选条件错误: {str(e)}"}
-    
+            return {"error": f"Invalid filter conditions: {str(e)}"}
+
     if column not in df.columns:
-        return {"error": f"列 '{column}' 不存在，可用列: {list(df.columns)}"}
+        return {"error": f"Column '{column}' does not exist. Available columns: {list(df.columns)}"}
     
     try:
         value_counts = df[column].value_counts()
@@ -464,7 +464,7 @@ def get_unique_values(
             "values": values,
         }
     except Exception as e:
-        return {"error": f"获取唯一值出错: {str(e)}"}
+        return {"error": f"Failed to get unique values: {str(e)}"}
 
 
 @tool
@@ -584,10 +584,10 @@ def generate_chart(
                     final_mask &= mask
             df = df[final_mask]
         except Exception as e:
-            return {"error": f"筛选条件错误: {str(e)}"}
+            return {"error": f"Invalid filter conditions: {str(e)}"}
     
     if len(df) == 0:
-        return {"error": "筛选后无数据，无法生成图表"}
+        return {"error": "No data after filtering; cannot generate chart."}
     
     # 自动推荐图表类型
     def recommend_chart_type() -> str:
@@ -646,7 +646,7 @@ def generate_chart(
             "message": message
         }
     except Exception as e:
-        return {"error": f"生成图表出错: {str(e)}"}
+        return {"error": f"Chart generation failed: {str(e)}"}
 
 
 def _prepare_chart_data(df: pd.DataFrame, chart_type: str, x_column: Optional[str],
@@ -670,14 +670,14 @@ def _prepare_chart_data(df: pd.DataFrame, chart_type: str, x_column: Optional[st
                     for _, row in grouped.iterrows()]
             return {"data": data, "data_count": len(data)}
         else:
-            return {"error": "饼图需要指定 group_by 分组列"}
+            return {"error": "Pie charts require `group_by`."}
     
     elif chart_type == "scatter":
         # 散点图：需要两个数值列
         if not x_column or not y_column:
-            return {"error": "散点图需要指定 x_column 和 y_column"}
+            return {"error": "Scatter charts require `x_column` and `y_column`."}
         if x_column not in df.columns or y_column not in df.columns:
-            return {"error": f"列不存在: {x_column} 或 {y_column}"}
+            return {"error": f"Missing column(s): {x_column} or {y_column}"}
         
         scatter_df = df[[x_column, y_column]].dropna().head(limit * 5)  # 散点图可以多一些点
         data = scatter_df.values.tolist()
@@ -691,11 +691,11 @@ def _prepare_chart_data(df: pd.DataFrame, chart_type: str, x_column: Optional[st
     elif chart_type == "radar":
         # 雷达图：多个指标对比
         if not series_columns or len(series_columns) < 3:
-            return {"error": "雷达图需要至少3个 series_columns 指标列"}
-        
+            return {"error": "Radar charts require at least 3 `series_columns`."}
+
         valid_cols = [c for c in series_columns if c in df.columns and pd.api.types.is_numeric_dtype(df[c])]
         if len(valid_cols) < 3:
-            return {"error": "雷达图需要至少3个有效的数值列"}
+            return {"error": "Radar charts require at least 3 valid numeric columns."}
         
         # 计算每个指标的聚合值
         if group_by and group_by in df.columns:
@@ -713,7 +713,7 @@ def _prepare_chart_data(df: pd.DataFrame, chart_type: str, x_column: Optional[st
             # 单系列雷达图
             indicators = [{"name": col, "max": float(df[col].max() * 1.2)} for col in valid_cols]
             values = [float(df[col].agg(agg_func)) for col in valid_cols]
-            return {"indicators": indicators, "series": [{"name": "数据", "value": values}], "data_count": 1}
+            return {"indicators": indicators, "series": [{"name": "Data", "value": values}], "data_count": 1}
     
     elif chart_type == "funnel":
         # 漏斗图：类似饼图，按值降序排列
@@ -730,20 +730,20 @@ def _prepare_chart_data(df: pd.DataFrame, chart_type: str, x_column: Optional[st
                     for _, row in grouped.iterrows()]
             return {"data": data, "data_count": len(data)}
         else:
-            return {"error": "漏斗图需要指定 group_by 分组列"}
+            return {"error": "Funnel charts require `group_by`."}
     
     else:
         # bar / line：分类 + 数值
         if not x_column:
-            return {"error": f"{chart_type}图需要指定 x_column"}
+            return {"error": f"{chart_type} charts require `x_column`."}
         if x_column not in df.columns:
-            return {"error": f"列 '{x_column}' 不存在"}
-        
+            return {"error": f"Column '{x_column}' does not exist."}
+
         # 多系列处理
         if series_columns:
             valid_series = [c for c in series_columns if c in df.columns]
             if not valid_series:
-                return {"error": "series_columns 中没有有效的列"}
+                return {"error": "No valid numeric columns found in `series_columns`."}
             
             # 按 x_column 分组，计算每个系列的聚合值
             grouped = df.groupby(x_column)[valid_series].agg(agg_func).head(limit)

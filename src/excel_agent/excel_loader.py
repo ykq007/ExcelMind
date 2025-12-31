@@ -9,6 +9,7 @@ from typing import Any, Dict, List, Optional
 import pandas as pd
 
 from .config import get_config
+from .language import Language, localize
 
 
 @dataclass
@@ -43,7 +44,7 @@ class ExcelLoader:
     def dataframe(self) -> pd.DataFrame:
         """获取 DataFrame"""
         if self._df is None:
-            raise ValueError("未加载 Excel 文件")
+            raise ValueError("No Excel file loaded")
         return self._df
     
     def load(self, file_path: str, sheet_name: Optional[str] = None) -> Dict[str, Any]:
@@ -83,7 +84,7 @@ class ExcelLoader:
     def get_structure(self) -> Dict[str, Any]:
         """获取 Excel 结构信息"""
         if self._df is None:
-            raise ValueError("未加载 Excel 文件")
+            raise ValueError("No Excel file loaded")
         
         config = get_config()
         
@@ -121,8 +122,8 @@ class ExcelLoader:
             预览数据
         """
         if self._df is None:
-            raise ValueError("未加载 Excel 文件")
-        
+            raise ValueError("No Excel file loaded")
+
         config = get_config()
         if n_rows is None:
             n_rows = config.excel.max_preview_rows
@@ -136,28 +137,44 @@ class ExcelLoader:
             "total_rows": len(self._df),
         }
     
-    def get_summary(self) -> str:
+    def get_summary(self, language: Language = "zh") -> str:
         """获取 Excel 摘要信息（用于 Agent 上下文）"""
         if self._df is None:
-            return "未加载 Excel 文件"
-        
+            return localize(language, en="No Excel file loaded.", zh="未加载 Excel 文件")
+
         structure = self.get_structure()
         preview = self.get_preview()
-        
-        lines = [
-            f"📊 **已加载 Excel 文件**: {structure['file_path']}",
-            f"📋 **当前工作表**: {structure['sheet_name']}",
-            f"📑 **所有工作表**: {', '.join(structure['all_sheets'])}",
-            f"📏 **数据规模**: {structure['total_rows']} 行 × {structure['total_columns']} 列",
-            "",
-            "**列信息**:",
-        ]
-        
-        for col in structure['columns']:
-            lines.append(f"  - `{col['name']}` ({col['dtype']}): {col['non_null_count']} 非空值")
-        
-        lines.append("")
-        lines.append(f"**前 {preview['preview_rows']} 行数据预览**:")
+
+        if language == "en":
+            lines = [
+                f"📊 **Loaded Excel file**: {structure['file_path']}",
+                f"📋 **Current sheet**: {structure['sheet_name']}",
+                f"📑 **All sheets**: {', '.join(structure['all_sheets'])}",
+                f"📏 **Shape**: {structure['total_rows']} rows × {structure['total_columns']} columns",
+                "",
+                "**Columns**:",
+            ]
+            for col in structure["columns"]:
+                lines.append(
+                    f"  - `{col['name']}` ({col['dtype']}): {col['non_null_count']} non-null"
+                )
+            lines.append("")
+            lines.append(f"**Preview (first {preview['preview_rows']} rows)**:")
+        else:
+            lines = [
+                f"📊 **已加载 Excel 文件**: {structure['file_path']}",
+                f"📋 **当前工作表**: {structure['sheet_name']}",
+                f"📑 **所有工作表**: {', '.join(structure['all_sheets'])}",
+                f"📏 **数据规模**: {structure['total_rows']} 行 × {structure['total_columns']} 列",
+                "",
+                "**列信息**:",
+            ]
+            for col in structure["columns"]:
+                lines.append(
+                    f"  - `{col['name']}` ({col['dtype']}): {col['non_null_count']} 非空值"
+                )
+            lines.append("")
+            lines.append(f"**前 {preview['preview_rows']} 行数据预览**:")
         
         # 简单表格格式
         if preview['data']:
@@ -398,16 +415,16 @@ class MultiExcelLoader:
         
         return table_id, new_loader.get_structure()
     
-    def get_active_summary(self) -> str:
+    def get_active_summary(self, language: Language = "zh") -> str:
         """获取当前活跃表的摘要"""
         loader = self.get_active_loader()
         if loader:
-            return loader.get_summary()
-        return "未加载 Excel 文件"
-    
-    def get_summary(self) -> str:
+            return loader.get_summary(language=language)
+        return localize(language, en="No Excel file loaded.", zh="未加载 Excel 文件")
+
+    def get_summary(self, language: Language = "zh") -> str:
         """获取当前活跃表的摘要（兼容旧接口）"""
-        return self.get_active_summary()
+        return self.get_active_summary(language=language)
     
     @property
     def dataframe(self) -> pd.DataFrame:
@@ -415,7 +432,7 @@ class MultiExcelLoader:
         loader = self.get_active_loader()
         if loader:
             return loader.dataframe
-        raise ValueError("未加载 Excel 文件")
+        raise ValueError("No Excel file loaded")
 
 
 # 全局实例 - 使用多表管理器

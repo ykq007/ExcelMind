@@ -1416,6 +1416,109 @@
         .kb-info-item {
             flex: 1;
         }
+
+        /* Password Modal */
+        .password-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .password-modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .password-modal {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 24px;
+            width: 400px;
+            max-width: 90%;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .password-modal-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .password-modal-desc {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .password-input-group {
+            margin-bottom: 20px;
+        }
+
+        .password-input-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 10px 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+
+        .password-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .password-modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .password-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .password-btn-cancel {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+        }
+
+        .password-btn-cancel:hover {
+            background: var(--border);
+        }
+
+        .password-btn-confirm {
+            background: var(--gradient-1);
+            color: white;
+        }
+
+        .password-btn-confirm:hover {
+            opacity: 0.9;
+        }
     </style>
 </head>
 
@@ -1608,6 +1711,22 @@
         <input type="file" id="kb-file-input" accept=".md,.txt,.markdown" style="display:none">
     </aside>
 
+    <!-- Password Modal -->
+    <div class="password-modal-overlay" id="password-modal">
+        <div class="password-modal">
+            <div class="password-modal-title">🔐 文件已加密</div>
+            <div class="password-modal-desc" id="password-filename">请输入文件密码以解密</div>
+            <div class="password-input-group">
+                <label for="password-input">密码</label>
+                <input type="password" id="password-input" class="password-input" placeholder="输入密码（留空表示无密码）">
+            </div>
+            <div class="password-modal-actions">
+                <button class="password-btn password-btn-cancel" id="password-cancel">取消</button>
+                <button class="password-btn password-btn-confirm" id="password-confirm">确认</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/echarts@5.5.1/dist/echarts.min.js"></script>
     <script>
@@ -1637,6 +1756,11 @@
         const uploadOverlayText = document.getElementById('upload-overlay-text');
         const uploadOverlaySub = document.getElementById('upload-overlay-sub');
         const activeTableIndicator = document.getElementById('active-table-indicator');
+        const passwordModal = document.getElementById('password-modal');
+        const passwordInput = document.getElementById('password-input');
+        const passwordFilename = document.getElementById('password-filename');
+        const passwordCancel = document.getElementById('password-cancel');
+        const passwordConfirm = document.getElementById('password-confirm');
 
         let isProcessing = false;
         let conversationHistory = [];
@@ -1646,6 +1770,46 @@
         let selectedTableIds = [];
         let table1Columns = [];
         let table2Columns = [];
+        let pendingFile = null; // 等待密码输入的文件
+        let passwordResolve = null; // Promise resolver
+
+        // Password modal handlers
+        passwordCancel.addEventListener('click', () => {
+            passwordModal.classList.remove('show');
+            passwordInput.value = '';
+            if (passwordResolve) {
+                passwordResolve(null);
+                passwordResolve = null;
+            }
+            pendingFile = null;
+        });
+
+        passwordConfirm.addEventListener('click', () => {
+            const password = passwordInput.value;
+            passwordModal.classList.remove('show');
+            passwordInput.value = '';
+            if (passwordResolve) {
+                passwordResolve(password);
+                passwordResolve = null;
+            }
+        });
+
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                passwordConfirm.click();
+            }
+        });
+
+        // 显示密码输入框
+        function showPasswordModal(filename) {
+            return new Promise((resolve) => {
+                passwordFilename.textContent = `文件 "${filename}" 已加密，请输入密码`;
+                passwordInput.value = '';
+                passwordModal.classList.add('show');
+                passwordInput.focus();
+                passwordResolve = resolve;
+            });
+        }
 
         // Upload handlers
         uploadZone.addEventListener('click', () => fileInput.click());
@@ -1681,12 +1845,33 @@
             uploadOverlay.classList.remove('show');
         }
 
-        async function uploadFile(file) {
+        async function uploadFile(file, password = null) {
             const formData = new FormData();
             formData.append('file', file);
+            if (password) {
+                formData.append('password', password);
+            }
             try {
                 const response = await fetch('/upload', { method: 'POST', body: formData });
-                if (!response.ok) throw new Error((await response.json()).detail || '上传失败');
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    const errorMsg = errorData.detail || '上传失败';
+
+                    // 检查是否是加密错误
+                    if (errorMsg.includes('加密') || errorMsg.includes('密码')) {
+                        // 显示密码输入框
+                        const enteredPassword = await showPasswordModal(file.name);
+                        if (enteredPassword !== null) {
+                            // 用户输入了密码，重试上传
+                            return await uploadFile(file, enteredPassword);
+                        } else {
+                            // 用户取消
+                            return;
+                        }
+                    }
+
+                    throw new Error(errorMsg);
+                }
                 const data = await response.json();
                 if (data.tables) updateTablesList(data.tables);
                 if (data.table_id) {

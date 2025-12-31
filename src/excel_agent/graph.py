@@ -10,6 +10,7 @@ from langgraph.prebuilt import ToolNode
 
 from .config import get_config
 from .excel_loader import get_loader
+from .language import detect_target_language, is_language_mismatch, language_label, localize, rewrite_system_prompt
 from .prompts import SYSTEM_PROMPT
 from .tools import ALL_TOOLS
 
@@ -32,24 +33,64 @@ def get_llm():
     )
 
 
+def _last_user_text(messages: List[BaseMessage]) -> str:
+    for msg in reversed(messages or []):
+        if isinstance(msg, HumanMessage):
+            return msg.content or ""
+    return ""
+
+
 def agent_node(state: AgentState) -> AgentState:
     """Agent 节点 - 规划和执行"""
     loader = get_loader()
-    excel_summary = loader.get_summary() if loader.is_loaded else "未加载 Excel 文件"
-    
+    user_text = _last_user_text(state.get("messages", []))
+    target_language = detect_target_language(user_text)
+
+    excel_summary = (
+        loader.get_summary(language=target_language)
+        if loader.is_loaded
+        else localize(
+            target_language,
+            en="No Excel file loaded.",
+            zh="未加载 Excel 文件",
+        )
+    )
+
     # 构建系统消息
-    system_message = SystemMessage(content=SYSTEM_PROMPT.format(excel_summary=excel_summary))
-    
+    system_message = SystemMessage(
+        content=SYSTEM_PROMPT.format(
+            excel_summary=excel_summary,
+            target_language=language_label(target_language),
+        )
+    )
+
     # 获取带工具的 LLM
     llm = get_llm()
     llm_with_tools = llm.bind_tools(ALL_TOOLS)
-    
+
     # 构建消息列表
     messages = [system_message] + state["messages"]
-    
+
     # 调用 LLM
     response = llm_with_tools.invoke(messages)
-    
+
+    # Final-answer language enforcement (never rewrite tool calls).
+    if (
+        isinstance(response, AIMessage)
+        and not response.tool_calls
+        and response.content
+        and is_language_mismatch(target_language, response.content)
+    ):
+        rewriter_llm = get_llm()
+        rewritten = rewriter_llm.invoke(
+            [
+                SystemMessage(content=rewrite_system_prompt(target_language)),
+                HumanMessage(content=response.content),
+            ]
+        )
+        if isinstance(rewritten, AIMessage) and rewritten.content:
+            response = AIMessage(content=rewritten.content)
+
     return {"messages": [response]}
 
 

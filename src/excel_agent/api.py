@@ -5,7 +5,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 from datetime import datetime, date
 
-from fastapi import FastAPI, HTTPException, UploadFile, File, Response
+from fastapi import FastAPI, HTTPException, UploadFile, File, Response, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
@@ -353,8 +353,18 @@ async def load_excel(request: LoadExcelRequest):
 
 
 @app.post("/upload", response_model=LoadExcelResponse)
-async def upload_excel(file: UploadFile = File(...), sheet_name: Optional[str] = None):
-    """上传 Excel 文件（追加模式，会添加到多表管理器）"""
+async def upload_excel(
+    file: UploadFile = File(...),
+    sheet_name: Optional[str] = Form(None),
+    password: Optional[str] = Form(None)
+):
+    """上传 Excel 文件（追加模式，会添加到多表管理器）
+
+    Args:
+        file: Excel 文件
+        sheet_name: 工作表名称（可选）
+        password: 文件密码（可选，用于加密文件）
+    """
     if not file.filename:
         raise HTTPException(status_code=400, detail="未提供文件")
     
@@ -369,23 +379,95 @@ async def upload_excel(file: UploadFile = File(...), sheet_name: Optional[str] =
             content = await file.read()
             tmp.write(content)
             tmp_path = tmp.name
-        
-        # 加载 Excel（追加模式）
+
+        # 检测并处理加密文件
+        decrypted_path = None
+        try:
+            import msoffcrypto
+            import io
+
+            # 尝试检测是否加密
+            with open(tmp_path, 'rb') as encrypted_file:
+                ms_file = msoffcrypto.OfficeFile(encrypted_file)
+
+                # 如果文件加密
+                if ms_file.is_encrypted():
+                    decrypted = io.BytesIO()
+
+                    # 尝试解密（优先使用用户提供的密码，否则尝试空密码）
+                    passwords_to_try = []
+                    if password:
+                        passwords_to_try.append(password)
+                    passwords_to_try.append('')  # 空密码
+
+                    decrypted_successfully = False
+                    for pwd in passwords_to_try:
+                        try:
+                            # 重新打开文件（每次尝试需要新的文件对象）
+                            with open(tmp_path, 'rb') as enc_f:
+                                ms_f = msoffcrypto.OfficeFile(enc_f)
+                                ms_f.load_key(password=pwd)
+                                decrypted = io.BytesIO()
+                                ms_f.decrypt(decrypted)
+
+                                # 保存解密后的文件
+                                with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as dec_tmp:
+                                    dec_tmp.write(decrypted.getvalue())
+                                    decrypted_path = dec_tmp.name
+
+                                # 使用解密后的文件
+                                tmp_path = decrypted_path
+                                decrypted_successfully = True
+                                break
+                        except Exception:
+                            continue
+
+                    if not decrypted_successfully:
+                        raise ValueError(f"文件 '{file.filename}' 已加密，密码错误或无法解密。")
+        except ImportError:
+            pass  # msoffcrypto 未安装，跳过加密检测
+        except Exception as decrypt_error:
+            if "加密" in str(decrypt_error) or "密码" in str(decrypt_error):
+                raise
+            # 其他错误忽略，继续尝试正常加载
+
+        # 尝试加载 Excel（追加模式）
         loader = get_loader()
-        table_id, structure = loader.add_table(tmp_path, sheet_name)
-        
+        error_msg = None
+
+        # 如果是 .xls 文件，尝试多种引擎
+        if suffix == '.xls':
+            try:
+                table_id, structure = loader.add_table(tmp_path, sheet_name)
+            except Exception as xls_error:
+                # 检测是否可能是 .xlsx 文件被误命名
+                error_str = str(xls_error)
+                if "OLE2" in error_str or "workbook" in error_str.lower():
+                    # 尝试用 .xlsx 引擎读取
+                    try:
+                        import pandas as pd
+                        pd.read_excel(tmp_path, engine='openpyxl', nrows=0)
+                        error_msg = f"文件 '{file.filename}' 实际是 .xlsx 格式，但扩展名是 .xls。请将文件重命名为 .xlsx 后重新上传。"
+                    except:
+                        error_msg = f"无法读取 .xls 文件。可能原因：1) 文件损坏；2) 文件实际格式不是 Excel；3) 文件是旧版 Excel 95 或更早版本（不支持）。错误详情: {error_str}"
+                    raise ValueError(error_msg)
+                else:
+                    raise
+        else:
+            table_id, structure = loader.add_table(tmp_path, sheet_name)
+
         # 更新文件名（临时文件路径替换为原始文件名）
         table_info = loader.get_table_info(table_id)
         if table_info:
             table_info.filename = file.filename
-        
+
         # 获取预览
         active_loader = loader.get_active_loader()
         preview = active_loader.get_preview() if active_loader else None
-        
+
         # 重置图
         reset_graph()
-        
+
         return LoadExcelResponse(
             success=True,
             message=f"成功上传并加载 Excel 文件: {file.filename}",
@@ -394,11 +476,29 @@ async def upload_excel(file: UploadFile = File(...), sheet_name: Optional[str] =
             preview=preview,
             tables=loader.list_tables(),
         )
+    except ValueError as e:
+        # 清理临时文件
+        if 'tmp_path' in locals():
+            try:
+                os.unlink(tmp_path)
+            except:
+                pass
+        if 'decrypted_path' in locals() and decrypted_path:
+            try:
+                os.unlink(decrypted_path)
+            except:
+                pass
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         # 清理临时文件
         if 'tmp_path' in locals():
             try:
                 os.unlink(tmp_path)
+            except:
+                pass
+        if 'decrypted_path' in locals() and decrypted_path:
+            try:
+                os.unlink(decrypted_path)
             except:
                 pass
         raise HTTPException(status_code=500, detail=f"处理失败: {str(e)}")

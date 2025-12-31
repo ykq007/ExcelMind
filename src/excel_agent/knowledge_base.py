@@ -12,6 +12,7 @@ from chromadb.config import Settings
 from langchain_openai import OpenAIEmbeddings
 
 from .config import get_config
+from .language import Language
 
 
 @dataclass
@@ -318,17 +319,24 @@ def reset_knowledge_base() -> None:
     _knowledge_base = None
 
 
-def format_knowledge_context(items: List[KnowledgeItem]) -> str:
+def format_knowledge_context(items: List[KnowledgeItem], language: Language = "zh") -> str:
     """将知识条目格式化为可注入 Prompt 的文本"""
     if not items:
-        return "暂无相关知识参考。"
-    
+        return "No relevant knowledge found." if language == "en" else "暂无相关知识参考。"
+
     parts = []
     for i, item in enumerate(items, 1):
-        parts.append(f"### 参考知识 {i}: {item.title}")
+        if language == "en":
+            parts.append(f"### Reference {i}: {item.title}")
+        else:
+            parts.append(f"### 参考知识 {i}: {item.title}")
         parts.append(item.content)
         if item.tags:
-            parts.append(f"**标签**: {', '.join(item.tags)}")
+            parts.append(
+                f"**Tags**: {', '.join(item.tags)}"
+                if language == "en"
+                else f"**标签**: {', '.join(item.tags)}"
+            )
         parts.append("")
-    
+
     return "\n".join(parts)
