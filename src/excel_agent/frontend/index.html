@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ExcelMind - Excel智能数据问答助手</title>
+    <title>ExcelMind - Intelligent Excel Data Assistant</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -1181,7 +1181,7 @@
             color: var(--text-secondary);
         }
 
-        /* 结果显示样式 */
+        /* Result display styles */
         .result-value {
             color: var(--success);
             font-weight: 600;
@@ -1763,14 +1763,14 @@
     <aside class="sidebar">
         <div class="sidebar-header">
             <h1>ExcelMind</h1>
-            <div class="subtitle">Excel 智能数据问答助手</div>
+            <div class="subtitle">Excel Intelligent Data Assistant</div>
         </div>
 
         <div class="upload-section">
             <div class="upload-zone" id="upload-zone">
                 <div class="upload-icon">📁</div>
-                <p class="upload-text">拖拽或点击上传 Excel</p>
-                <p class="upload-hint">支持多个文件</p>
+                <p class="upload-text">Drag or click to upload Excel</p>
+                <p class="upload-hint">Multiple files supported</p>
             </div>
             <input type="file" id="file-input" accept=".xlsx,.xls,.xlsm" multiple>
         </div>
@@ -1778,17 +1778,17 @@
         <div class="tables-section">
             <div class="tables-header">
                 <div class="tables-title">
-                    数据表
+                    Data Tables
                     <span class="tables-count" id="tables-count">0</span>
                 </div>
-                <button class="btn-clear-all" id="btn-clear-all">清空</button>
+                <button class="btn-clear-all" id="btn-clear-all">Clear All</button>
             </div>
             <div class="tables-list" id="tables-list">
-                <div class="tables-empty" id="tables-empty">暂无数据表</div>
+                <div class="tables-empty" id="tables-empty">No data tables available</div>
             </div>
             <div class="join-btn-container">
                 <button class="btn-join" id="btn-join" disabled>
-                    🤖 智能联表
+                    🤖 Smart Join
                 </button>
             </div>
         </div>
@@ -1798,44 +1798,44 @@
     <div class="modal-overlay" id="join-modal">
         <div class="modal">
             <div class="modal-header">
-                <h2>🔗 表格联查</h2>
+                <h2>🔗 Table Join</h2>
                 <button class="modal-close" id="modal-close">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="form-group">
-                    <label class="form-label">新表名称</label>
-                    <input type="text" class="form-input" id="join-name" placeholder="例如：用户订单联合表">
+                    <label class="form-label">New Table Name</label>
+                    <input type="text" class="form-input" id="join-name" placeholder="e.g., User_Orders_Joined">
                 </div>
 
                 <div class="table-preview" id="table1-preview"></div>
                 <div class="table-preview" id="table2-preview"></div>
 
                 <div class="form-group">
-                    <label class="form-label">连接字段 <button type="button" class="btn-add-key" id="btn-add-key">+
-                            添加字段</button></label>
+                    <label class="form-label">Join Keys <button type="button" class="btn-add-key" id="btn-add-key">+
+                            Add Key</button></label>
                     <div id="key-pairs-container">
                         <!-- Key pairs will be added here dynamically -->
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">连接类型</label>
+                    <label class="form-label">Join Type</label>
                     <select class="form-select" id="join-type">
-                        <option value="inner">inner - 仅保留匹配行</option>
-                        <option value="left">left - 保留左表全部</option>
-                        <option value="right">right - 保留右表全部</option>
-                        <option value="outer">outer - 保留全部行</option>
+                        <option value="inner">inner - Keep matching rows only</option>
+                        <option value="left">left - Keep all rows from left table</option>
+                        <option value="right">right - Keep all rows from right table</option>
+                        <option value="outer">outer - Keep all rows</option>
                     </select>
                 </div>
 
                 <div class="form-warning">
                     <span>⚠️</span>
-                    <span>请确保对应的连接字段数据类型和含义一致，否则可能产生错误结果。</span>
+                    <span>Ensure join keys have consistent data types and meanings to avoid errors.</span>
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn-cancel" id="join-cancel">取消</button>
-                <button class="btn-confirm" id="join-confirm">确认连接</button>
+                <button class="btn-cancel" id="join-cancel">Cancel</button>
+                <button class="btn-confirm" id="join-confirm">Confirm Join</button>
             </div>
         </div>
     </div>
@@ -1844,45 +1844,45 @@
     <div class="modal-overlay" id="kb-modal">
         <div class="modal kb-modal">
             <div class="modal-header">
-                <h2 id="kb-modal-title">📚 知识详情</h2>
+                <h2 id="kb-modal-title">📚 Knowledge Details</h2>
                 <button class="modal-close" id="kb-modal-close">&times;</button>
             </div>
             <div class="modal-body kb-modal-body">
                 <div class="form-group">
-                    <label class="form-label">标题</label>
-                    <input type="text" class="form-input" id="kb-title" placeholder="知识条目标题">
+                    <label class="form-label">Title</label>
+                    <input type="text" class="form-input" id="kb-title" placeholder="Knowledge entry title">
                 </div>
                 <div class="form-group">
-                    <label class="form-label">内容</label>
-                    <textarea class="kb-content-input" id="kb-content" placeholder="输入知识内容..."></textarea>
+                    <label class="form-label">Content</label>
+                    <textarea class="kb-content-input" id="kb-content" placeholder="Enter knowledge content..."></textarea>
                 </div>
                 <div class="kb-info-row">
                     <div class="kb-info-item">
-                        <label class="form-label">分类</label>
+                        <label class="form-label">Category</label>
                         <select class="form-select" id="kb-category">
-                            <option value="general">通用</option>
-                            <option value="field_rule">字段规则</option>
-                            <option value="task_pattern">任务模式</option>
-                            <option value="business_logic">业务逻辑</option>
+                            <option value="general">General</option>
+                            <option value="field_rule">Field Rule</option>
+                            <option value="task_pattern">Task Pattern</option>
+                            <option value="business_logic">Business Logic</option>
                         </select>
                     </div>
                     <div class="kb-info-item">
-                        <label class="form-label">优先级</label>
+                        <label class="form-label">Priority</label>
                         <select class="form-select" id="kb-priority">
-                            <option value="normal">普通</option>
-                            <option value="high">高</option>
-                            <option value="low">低</option>
+                            <option value="normal">Normal</option>
+                            <option value="high">High</option>
+                            <option value="low">Low</option>
                         </select>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">标签（用逗号分隔）</label>
-                    <input type="text" class="kb-tags-input" id="kb-tags" placeholder="例如：账期, 日期格式, YYYYMM">
+                    <label class="form-label">Tags (comma separated)</label>
+                    <input type="text" class="kb-tags-input" id="kb-tags" placeholder="e.g., billing_period, date_format, YYYYMM">
                 </div>
             </div>
             <div class="modal-footer">
-                <button class="btn-cancel" id="kb-modal-cancel">取消</button>
-                <button class="btn-confirm" id="kb-modal-save">保存</button>
+                <button class="btn-cancel" id="kb-modal-cancel">Cancel</button>
+                <button class="btn-confirm" id="kb-modal-save">Save</button>
             </div>
         </div>
     </div>
@@ -1890,16 +1890,16 @@
     <!-- Upload Overlay -->
     <div class="upload-overlay" id="upload-overlay">
         <div class="upload-spinner"></div>
-        <div class="upload-overlay-text" id="upload-overlay-text">正在上传...</div>
-        <div class="upload-overlay-sub" id="upload-overlay-sub">请稍候，文件较大时可能需要一些时间</div>
+        <div class="upload-overlay-text" id="upload-overlay-text">Uploading...</div>
+        <div class="upload-overlay-sub" id="upload-overlay-sub">Please wait, larger files may take some time</div>
     </div>
 
     <!-- Main Content -->
     <main class="main-content">
         <header class="header">
             <span class="header-title">
-                <span class="active-table-label">当前目标表：</span>
-                <div class="active-table-indicator" id="active-table-indicator">请先上传数据表</div>
+                <span class="active-table-label">Current Target Table:</span>
+                <div class="active-table-indicator" id="active-table-indicator">Please upload a data table first</div>
             </span>
         </header>
 
@@ -1907,13 +1907,13 @@
             <div class="chat-messages" id="chat-messages">
                 <div class="chat-empty" id="chat-empty">
                     <div class="chat-empty-icon">💬</div>
-                    <h3>开始对话</h3>
-                    <p>在左侧上传 Excel 文件后，即可询问数据问题</p>
+                    <h3>Start Conversation</h3>
+                    <p>Upload an Excel file to start asking questions about your data</p>
                 </div>
             </div>
             <div class="chat-input-container">
                 <div class="chat-input-wrapper">
-                    <textarea class="chat-input" id="chat-input" placeholder="请先上传 Excel 文件" rows="1"
+                    <textarea class="chat-input" id="chat-input" placeholder="Please upload an Excel file first" rows="1"
                         disabled></textarea>
                     <button class="send-btn" id="send-btn" disabled>
                         <svg viewBox="0 0 24 24">
@@ -1929,20 +1929,20 @@
     <aside class="right-sidebar">
         <div class="knowledge-header">
             <div class="knowledge-title">
-                📚 知识库
+                📚 Knowledge Base
                 <span class="knowledge-count" id="knowledge-count">0</span>
             </div>
             <div class="knowledge-actions">
-                <button class="kb-btn-small" id="kb-btn-add" title="添加知识">+</button>
-                <button class="kb-btn-small" id="kb-btn-refresh" title="刷新">↻</button>
+                <button class="kb-btn-small" id="kb-btn-add" title="Add Knowledge">+</button>
+                <button class="kb-btn-small" id="kb-btn-refresh" title="Refresh">↻</button>
             </div>
         </div>
         <div class="knowledge-list" id="knowledge-list">
-            <div class="knowledge-empty" id="knowledge-empty">暂无知识条目</div>
+            <div class="knowledge-empty" id="knowledge-empty">No knowledge entries available</div>
         </div>
         <div class="knowledge-upload-zone" id="kb-upload-zone">
             <div class="knowledge-upload-icon">📄</div>
-            <p class="knowledge-upload-text">拖拽或点击上传 (.md/.txt)</p>
+            <p class="knowledge-upload-text">Drag or click to upload (.md/.txt)</p>
         </div>
         <input type="file" id="kb-file-input" accept=".md,.txt,.markdown" style="display:none">
     </aside>
@@ -1950,15 +1950,15 @@
     <!-- Password Modal -->
     <div class="password-modal-overlay" id="password-modal">
         <div class="password-modal">
-            <div class="password-modal-title">🔐 文件已加密</div>
-            <div class="password-modal-desc" id="password-filename">请输入文件密码以解密</div>
+            <div class="password-modal-title">🔐 File Encrypted</div>
+            <div class="password-modal-desc" id="password-filename">Please enter the password to decrypt the file</div>
             <div class="password-input-group">
-                <label for="password-input">密码</label>
-                <input type="password" id="password-input" class="password-input" placeholder="输入密码（留空表示无密码）">
+                <label for="password-input">Password</label>
+                <input type="password" id="password-input" class="password-input" placeholder="Enter password (leave empty if none)">
             </div>
             <div class="password-modal-actions">
-                <button class="password-btn password-btn-cancel" id="password-cancel">取消</button>
-                <button class="password-btn password-btn-confirm" id="password-confirm">确认</button>
+                <button class="password-btn password-btn-cancel" id="password-cancel">Cancel</button>
+                <button class="password-btn password-btn-confirm" id="password-confirm">Confirm</button>
             </div>
         </div>
     </div>
@@ -2039,7 +2039,7 @@
         // 显示密码输入框
         function showPasswordModal(filename) {
             return new Promise((resolve) => {
-                passwordFilename.textContent = `文件 "${filename}" 已加密，请输入密码`;
+                passwordFilename.textContent = `File "${filename}" is encrypted, please enter password`;
                 passwordInput.value = '';
                 passwordModal.classList.add('show');
                 passwordInput.focus();
@@ -2057,7 +2057,7 @@
             if (e.dataTransfer.files.length > 0) handleFiles(e.dataTransfer.files);
         });
         fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) handleFiles(e.target.files); });
-        btnClearAll.addEventListener('click', async () => { if (confirm('确定清空所有表？')) await resetAgent(); });
+        btnClearAll.addEventListener('click', async () => { if (confirm('Are you sure you want to clear all tables?')) await resetAgent(); });
 
         async function handleFiles(files) {
             const validFiles = Array.from(files).filter(f => {
@@ -2067,17 +2067,17 @@
 
             if (validFiles.length === 0) return;
 
-            // 显示上传遮罩
+            // Show upload overlay
             uploadOverlay.classList.add('show');
 
             for (let i = 0; i < validFiles.length; i++) {
                 const file = validFiles[i];
-                uploadOverlayText.textContent = `正在上传 (${i + 1}/${validFiles.length}): ${file.name}`;
-                uploadOverlaySub.textContent = '请稍候，文件较大时可能需要一些时间';
+                uploadOverlayText.textContent = `Uploading (${i + 1}/${validFiles.length}): ${file.name}`;
+                uploadOverlaySub.textContent = 'Please wait, larger files may take some time';
                 await uploadFile(file);
             }
 
-            // 隐藏上传遮罩
+            // Hide upload overlay
             uploadOverlay.classList.remove('show');
         }
 
@@ -2091,17 +2091,17 @@
                 const response = await fetch('/upload', { method: 'POST', body: formData });
                 if (!response.ok) {
                     const errorData = await response.json();
-                    const errorMsg = errorData.detail || '上传失败';
+                    const errorMsg = errorData.detail || 'Upload failed';
 
-                    // 检查是否是加密错误
+                    // Check for encryption error
                     if (errorMsg.includes('加密') || errorMsg.includes('密码')) {
-                        // 显示密码输入框
+                        // Show password input
                         const enteredPassword = await showPasswordModal(file.name);
                         if (enteredPassword !== null) {
-                            // 用户输入了密码，重试上传
+                            // User entered password, retry upload
                             return await uploadFile(file, enteredPassword);
                         } else {
-                            // 用户取消
+                            // User cancelled
                             return;
                         }
                     }
@@ -2115,7 +2115,7 @@
                     tableNames[data.table_id] = file.name;
                 }
             } catch (error) {
-                alert('上传失败: ' + error.message);
+                alert('Upload failed: ' + error.message);
             }
             updateStatus();
         }
@@ -2127,7 +2127,7 @@
             updateJoinButton();
 
             if (tables.length === 0) {
-                tablesList.innerHTML = '<div class="tables-empty">暂无数据表</div>';
+                tablesList.innerHTML = '<div class="tables-empty">No data tables available</div>';
                 return;
             }
 
@@ -2137,7 +2137,7 @@
                 const isSelected = selectedTableIds.includes(table.id);
                 const icon = table.is_joined ? '🔗' : '📊';
                 const tooltip = table.is_joined && table.source_tables
-                    ? `连接表：${table.source_tables.join(' + ')}`
+                    ? `Joined table: ${table.source_tables.join(' + ')}`
                     : table.filename;
 
                 const item = document.createElement('div');
@@ -2149,10 +2149,10 @@
                         <span class="table-icon">${icon}</span>
                         <div class="table-info">
                             <div class="table-name" title="${tooltip}">${table.filename}</div>
-                            <div class="table-meta">${table.total_rows}行 × ${table.total_columns}列</div>
+                            <div class="table-meta">${table.total_rows} rows × ${table.total_columns} cols</div>
                         </div>
                     </div>
-                    <button class="table-delete" title="删除">×</button>
+                    <button class="table-delete" title="Delete">×</button>
                 `;
 
                 const checkbox = item.querySelector('.table-checkbox');
@@ -2215,11 +2215,11 @@
             if (selectedTableIds.length === 2) {
                 const t1 = tables.find(t => t.id === selectedTableIds[0]);
                 const t2 = tables.find(t => t.id === selectedTableIds[1]);
-                btnJoin.innerHTML = `🤖 智能联表: ${t1?.filename?.substring(0, 6) || '表1'}... + ${t2?.filename?.substring(0, 6) || '表2'}...`;
+                btnJoin.innerHTML = `🤖 Smart Join: ${t1?.filename?.substring(0, 6) || 'Table1'}... + ${t2?.filename?.substring(0, 6) || 'Table2'}...`;
             } else {
                 btnJoin.innerHTML = selectedTableIds.length === 0
-                    ? '🤖 智能联表 (选择2张表)'
-                    : `🤖 智能联表 (已选${selectedTableIds.length}/2)`;
+                    ? '🤖 Smart Join (Select 2 tables)'
+                    : `🤖 Smart Join (Selected ${selectedTableIds.length}/2)`;
             }
         }
 
@@ -2235,26 +2235,26 @@
             row.className = 'key-pair-row';
             row.innerHTML = `
                 <div class="key-select-group">
-                    <span class="key-select-label">表1字段</span>
+                    <span class="key-select-label">Table 1 Field</span>
                     <select class="key1-select">
                         ${table1Columns.map(c => `<option value="${c}" ${c === key1Value ? 'selected' : ''}>${c}</option>`).join('')}
                     </select>
                 </div>
                 <span class="key-pair-arrow">↔</span>
                 <div class="key-select-group">
-                    <span class="key-select-label">表2字段</span>
+                    <span class="key-select-label">Table 2 Field</span>
                     <select class="key2-select">
                         ${table2Columns.map(c => `<option value="${c}" ${c === key2Value ? 'selected' : ''}>${c}</option>`).join('')}
                     </select>
                 </div>
-                <button type="button" class="btn-remove-key" title="移除">×</button>
+                <button type="button" class="btn-remove-key" title="Remove">×</button>
             `;
 
             row.querySelector('.btn-remove-key').addEventListener('click', () => {
                 if (keyPairsContainer.children.length > 1) {
                     row.remove();
                 } else {
-                    alert('至少需要一个连接字段');
+                    alert('At least one join key is required');
                 }
             });
 
@@ -2268,15 +2268,15 @@
             const t1 = tables.find(t => t.id === id1);
             const t2 = tables.find(t => t.id === id2);
 
-            // 显示AI分析遮罩
-            uploadOverlayText.textContent = '🤖 AI 正在分析表结构...';
-            uploadOverlaySub.textContent = '请稍候，AI正在智能匹配联表字段';
+            // Show AI analysis overlay
+            uploadOverlayText.textContent = '🤖 AI is analyzing table structure...';
+            uploadOverlaySub.textContent = 'Please wait, AI is matching join keys';
             uploadOverlay.classList.add('show');
 
-            table1Preview.textContent = `表1: ${t1?.filename} (${t1?.total_rows}行)`;
-            table2Preview.textContent = `表2: ${t2?.filename} (${t2?.total_rows}行)`;
+            table1Preview.textContent = `Table 1: ${t1?.filename} (${t1?.total_rows} rows)`;
+            table2Preview.textContent = `Table 2: ${t2?.filename} (${t2?.total_rows} rows)`;
 
-            // 获取列名
+            // Get column names
             try {
                 const [cols1, cols2] = await Promise.all([
                     fetch(`/tables/${id1}/columns`).then(r => r.json()),
@@ -2287,11 +2287,11 @@
                 table2Columns = cols2.columns || [];
             } catch (e) {
                 uploadOverlay.classList.remove('show');
-                alert('获取列信息失败');
+                alert('Failed to get column information');
                 return;
             }
 
-            // 调用AI建议API
+            // Call AI suggestion API
             let aiSuggestion = null;
             try {
                 const response = await fetch('/tables/suggest-join', {
@@ -2305,31 +2305,31 @@
                     aiSuggestion = data.suggestion;
                 }
             } catch (e) {
-                console.warn('AI建议获取失败，使用默认值', e);
+                console.warn('Failed to get AI suggestion, using defaults', e);
             }
 
             uploadOverlay.classList.remove('show');
 
-            // 清空并添加字段对
+            // Clear and add key pairs
             keyPairsContainer.innerHTML = '';
 
             if (aiSuggestion && aiSuggestion.keys1 && aiSuggestion.keys2) {
-                // 使用AI建议预填充
-                joinName.value = aiSuggestion.new_name || `${t1?.filename?.split('.')[0]}_${t2?.filename?.split('.')[0]}_联合`;
+                // Use AI suggestion to pre-fill
+                joinName.value = aiSuggestion.new_name || `${t1?.filename?.split('.')[0]}_${t2?.filename?.split('.')[0]}_joined`;
                 joinType.value = aiSuggestion.join_type || 'inner';
 
-                // 添加AI建议的字段对
+                // Add AI suggested key pairs
                 for (let i = 0; i < aiSuggestion.keys1.length; i++) {
                     addKeyPair(aiSuggestion.keys1[i], aiSuggestion.keys2[i]);
                 }
 
-                // 显示AI建议原因
+                // Show AI suggestion reason
                 if (aiSuggestion.reason) {
-                    console.log('AI建议原因:', aiSuggestion.reason);
+                    console.log('AI suggestion reason:', aiSuggestion.reason);
                 }
             } else {
-                // 默认值
-                joinName.value = `${t1?.filename?.split('.')[0] || '表1'}_${t2?.filename?.split('.')[0] || '表2'}_联合`;
+                // Default values
+                joinName.value = `${t1?.filename?.split('.')[0] || 'Table1'}_${t2?.filename?.split('.')[0] || 'Table2'}_joined`;
                 addKeyPair();
             }
 
@@ -2342,9 +2342,9 @@
 
         joinConfirm.addEventListener('click', async () => {
             const name = joinName.value.trim();
-            if (!name) { alert('请输入新表名称'); return; }
+            if (!name) { alert('Please enter a new table name'); return; }
 
-            // 收集所有字段对
+            // Collect all key pairs
             const keyRows = keyPairsContainer.querySelectorAll('.key-pair-row');
             const keys1 = [];
             const keys2 = [];
@@ -2355,12 +2355,12 @@
             });
 
             if (keys1.length === 0) {
-                alert('至少需要一个连接字段');
+                alert('At least one join key is required');
                 return;
             }
 
             joinConfirm.disabled = true;
-            joinConfirm.textContent = '连接中...';
+            joinConfirm.textContent = 'Joining...';
 
             try {
                 const response = await fetch('/tables/join', {
@@ -2376,7 +2376,7 @@
                     })
                 });
 
-                if (!response.ok) throw new Error((await response.json()).detail || '连接失败');
+                if (!response.ok) throw new Error((await response.json()).detail || 'Join failed');
 
                 const data = await response.json();
                 selectedTableIds = [];
@@ -2384,10 +2384,10 @@
                 closeJoinModal();
                 updateStatus();
             } catch (error) {
-                alert('连接失败: ' + error.message);
+                alert('Join failed: ' + error.message);
             } finally {
                 joinConfirm.disabled = false;
-                joinConfirm.textContent = '确认连接';
+                joinConfirm.textContent = 'Confirm Join';
             }
         });
 
@@ -2404,7 +2404,7 @@
                 if (data.tables) updateTablesList(data.tables);
                 updateStatus();
             } catch (error) {
-                alert('切换失败: ' + error.message);
+                alert('Switch failed: ' + error.message);
             }
         }
 
@@ -2419,21 +2419,21 @@
                 updateStatus();
                 if (tables.length === 0) disableChat();
             } catch (error) {
-                alert('删除失败: ' + error.message);
+                alert('Delete failed: ' + error.message);
             }
         }
 
         function updateStatus() {
             if (tables.length === 0) {
-                activeTableIndicator.innerHTML = '请先上传数据表';
+                activeTableIndicator.innerHTML = 'Please upload a data table first';
             } else {
                 const activeTable = tables.find(t => t.is_active);
-                // 更新活跃表指示器
+                // Update active table indicator
                 if (activeTable) {
                     const icon = activeTable.is_joined ? '🔗' : '📊';
                     activeTableIndicator.innerHTML = `${icon} <span title="${activeTable.filename}">${activeTable.filename}</span>`;
                 } else {
-                    activeTableIndicator.innerHTML = '请选择一张表';
+                    activeTableIndicator.innerHTML = 'Please select a table';
                 }
             }
         }
@@ -2441,14 +2441,14 @@
         function enableChat() {
             chatInput.disabled = false;
             sendBtn.disabled = false;
-            chatInput.placeholder = '输入问题，例如：这个表有多少行？';
+            chatInput.placeholder = 'Type your question, e.g., How many rows are in this table?';
             chatInput.focus();
         }
 
         function disableChat() {
             chatInput.disabled = true;
             sendBtn.disabled = true;
-            chatInput.placeholder = '请先上传 Excel 文件';
+            chatInput.placeholder = 'Please upload an Excel file first';
         }
 
         async function resetAgent() {
@@ -2459,17 +2459,17 @@
                 tableNames = {};
                 conversationHistory = [];
                 selectedTableIds = [];
-                tablesList.innerHTML = '<div class="tables-empty">暂无数据表</div>';
+                tablesList.innerHTML = '<div class="tables-empty">No data tables available</div>';
                 tablesCount.textContent = '0';
                 statusBadge.classList.remove('loaded');
-                statusText.textContent = '未加载文件';
+                statusText.textContent = 'No file loaded';
                 disableChat();
                 updateJoinButton();
                 chatMessages.innerHTML = `
                     <div class="chat-empty" id="chat-empty">
                         <div class="chat-empty-icon">💬</div>
-                        <h3>开始对话</h3>
-                        <p>在左侧上传 Excel 文件后，即可询问数据问题</p>
+                        <h3>Start Conversation</h3>
+                        <p>Upload an Excel file to start asking questions about your data</p>
                     </div>
                 `;
             } catch (error) { console.error('Reset failed:', error); }
@@ -2560,13 +2560,13 @@
                                         if (currentThinkingBlock) {
                                             currentThinkingBlock.classList.add('finished');
 
-                                            // 隐藏加载动画
+                                            // Hide loading animation
                                             const dots = currentThinkingBlock.querySelector('.loading-dots');
-                                            if (dots) dots.remove(); // 直接移除更彻底
+                                            if (dots) dots.remove(); // Remove completely
 
-                                            // 更新标题文本
+                                            // Update header text
                                             const headerText = currentThinkingBlock.querySelector('.thinking-header span:nth-child(2)');
-                                            if (headerText) headerText.textContent = '思考过程';
+                                            if (headerText) headerText.textContent = 'Thought Process';
 
                                             currentThinkingBlock = null;
                                         }
@@ -2646,7 +2646,7 @@
             div.className = 'thinking-block';
             div.innerHTML = `
                 <div class="thinking-header">
-                    <span>🧠</span><span>思考中</span>
+                    <span>🧠</span><span>Thinking</span>
                     <div class="loading-dots"><span></span><span></span><span></span></div>
                 </div>
                 <div class="thinking-content"></div>
@@ -2658,117 +2658,117 @@
             const div = document.createElement('div');
             div.className = 'tool-block';
 
-            // 生成自然语言描述
+            // Generate natural language description
             const description = getToolDescription(name, args);
 
             div.innerHTML = `
-                <div class="tool-header"><span>🔧</span><span>执行操作:</span><span class="tool-name">${getToolDisplayName(name)}</span></div>
+                <div class="tool-header"><span>🔧</span><span>Executing:</span><span class="tool-name">${getToolDisplayName(name)}</span></div>
                 <div class="tool-description">${description}</div>
                 <details class="tool-details">
-                    <summary>查看详细参数</summary>
+                    <summary>View detailed parameters</summary>
                     <div class="tool-args">${JSON.stringify(args, null, 2)}</div>
                 </details>
             `;
             return div;
         }
 
-        // 获取工具的中文显示名称
+        // Get tool display name
         function getToolDisplayName(name) {
             const names = {
-                'filter_data': '数据筛选',
-                'aggregate_data': '数据聚合',
-                'group_and_aggregate': '分组统计',
-                'sort_data': '数据排序',
-                'search_data': '数据搜索',
-                'get_column_stats': '列统计',
-                'get_unique_values': '获取唯一值',
-                'get_data_preview': '数据预览',
-                'get_current_time': '获取时间',
-                'calculate': '数学计算',
-                'generate_chart': '📊 生成图表'
+                'filter_data': 'Filter Data',
+                'aggregate_data': 'Aggregate Data',
+                'group_and_aggregate': 'Group Statistics',
+                'sort_data': 'Sort Data',
+                'search_data': 'Search Data',
+                'get_column_stats': 'Column Statistics',
+                'get_unique_values': 'Get Unique Values',
+                'get_data_preview': 'Data Preview',
+                'get_current_time': 'Get Time',
+                'calculate': 'Math Calculation',
+                'generate_chart': '📊 Generate Chart'
             };
             return names[name] || name;
         }
 
-        // 将工具调用参数转换为自然语言描述
+        // Convert tool call parameters to natural language description
         function getToolDescription(name, args) {
             switch (name) {
                 case 'filter_data': {
                     const parts = [];
                     if (args.filters && args.filters.length > 0) {
                         const conditions = args.filters.map(f => formatCondition(f.column, f.operator, f.value));
-                        parts.push(`筛选条件: ${conditions.join(' 且 ')}`);
+                        parts.push(`Filter conditions: ${conditions.join(' AND ')}`);
                     } else if (args.column && args.operator) {
-                        parts.push(`筛选条件: ${formatCondition(args.column, args.operator, args.value)}`);
+                        parts.push(`Filter condition: ${formatCondition(args.column, args.operator, args.value)}`);
                     }
                     if (args.select_columns && args.select_columns.length > 0) {
-                        parts.push(`返回列: ${args.select_columns.join(', ')}`);
+                        parts.push(`Return columns: ${args.select_columns.join(', ')}`);
                     }
-                    if (args.limit) parts.push(`最多返回 ${args.limit} 条`);
-                    return parts.join('<br>') || '筛选数据';
+                    if (args.limit) parts.push(`Max ${args.limit} rows`);
+                    return parts.join('<br>') || 'Filter data';
                 }
                 case 'aggregate_data': {
                     const parts = [];
-                    const funcName = { sum: '求和', mean: '平均值', count: '计数', min: '最小值', max: '最大值', median: '中位数', std: '标准差' };
-                    parts.push(`对 <b>${args.column}</b> 列计算 <b>${funcName[args.agg_func] || args.agg_func}</b>`);
+                    const funcName = { sum: 'Sum', mean: 'Mean', count: 'Count', min: 'Min', max: 'Max', median: 'Median', std: 'Std Dev' };
+                    parts.push(`Calculate <b>${funcName[args.agg_func] || args.agg_func}</b> of <b>${args.column}</b> column`);
                     if (args.filters && args.filters.length > 0) {
                         const conditions = args.filters.map(f => formatCondition(f.column, f.operator, f.value));
-                        parts.push(`筛选条件: ${conditions.join(' 且 ')}`);
+                        parts.push(`Filter conditions: ${conditions.join(' AND ')}`);
                     }
                     return parts.join('<br>');
                 }
                 case 'group_and_aggregate': {
-                    const funcName = { sum: '求和', mean: '平均值', count: '计数', min: '最小值', max: '最大值' };
-                    const parts = [`按 <b>${args.group_by}</b> 分组，对 <b>${args.agg_column}</b> 计算 <b>${funcName[args.agg_func] || args.agg_func}</b>`];
+                    const funcName = { sum: 'Sum', mean: 'Mean', count: 'Count', min: 'Min', max: 'Max' };
+                    const parts = [`Group by <b>${args.group_by}</b>, calculate <b>${funcName[args.agg_func] || args.agg_func}</b> of <b>${args.agg_column}</b>`];
                     if (args.filters && args.filters.length > 0) {
                         const conditions = args.filters.map(f => formatCondition(f.column, f.operator, f.value));
-                        parts.push(`筛选条件: ${conditions.join(' 且 ')}`);
+                        parts.push(`Filter conditions: ${conditions.join(' AND ')}`);
                     }
                     return parts.join('<br>');
                 }
                 case 'sort_data': {
-                    const order = args.ascending === false ? '降序' : '升序';
-                    const parts = [`按 <b>${args.column}</b> ${order}排序`];
+                    const order = args.ascending === false ? 'Descending' : 'Ascending';
+                    const parts = [`Sort by <b>${args.column}</b> ${order}`];
                     if (args.filters && args.filters.length > 0) {
                         const conditions = args.filters.map(f => formatCondition(f.column, f.operator, f.value));
-                        parts.push(`筛选条件: ${conditions.join(' 且 ')}`);
+                        parts.push(`Filter conditions: ${conditions.join(' AND ')}`);
                     }
                     return parts.join('<br>');
                 }
                 case 'search_data':
-                    return `搜索关键词: <b>${args.keyword}</b>` + (args.columns ? ` (在 ${args.columns.join(', ')} 列中)` : ' (全表)');
+                    return `Search keyword: <b>${args.keyword}</b>` + (args.columns ? ` (in columns: ${args.columns.join(', ')})` : ' (all columns)');
                 case 'get_column_stats': {
-                    const parts = [`获取 <b>${args.column}</b> 列的统计信息`];
+                    const parts = [`Get statistics for <b>${args.column}</b> column`];
                     if (args.filters && args.filters.length > 0) {
                         const conditions = args.filters.map(f => formatCondition(f.column, f.operator, f.value));
-                        parts.push(`筛选条件: ${conditions.join(' 且 ')}`);
+                        parts.push(`Filter conditions: ${conditions.join(' AND ')}`);
                     }
                     return parts.join('<br>');
                 }
                 case 'get_unique_values': {
-                    const parts = [`获取 <b>${args.column}</b> 列的唯一值`];
+                    const parts = [`Get unique values from <b>${args.column}</b> column`];
                     if (args.filters && args.filters.length > 0) {
                         const conditions = args.filters.map(f => formatCondition(f.column, f.operator, f.value));
-                        parts.push(`筛选条件: ${conditions.join(' 且 ')}`);
+                        parts.push(`Filter conditions: ${conditions.join(' AND ')}`);
                     }
                     return parts.join('<br>');
                 }
                 case 'get_data_preview':
-                    return `预览前 ${args.n_rows || 10} 行数据`;
+                    return `Preview first ${args.n_rows || 10} rows`;
                 case 'get_current_time':
-                    return '获取当前系统时间';
+                    return 'Get current system time';
                 case 'calculate':
                     if (args.expressions && args.expressions.length > 0) {
-                        return `计算表达式: ${args.expressions.map(e => `<code>${e}</code>`).join(', ')}`;
+                        return `Calculate expressions: ${args.expressions.map(e => `<code>${e}</code>`).join(', ')}`;
                     }
-                    return '执行数学计算';
+                    return 'Perform mathematical calculation';
                 case 'generate_chart': {
-                    const chartTypes = { bar: '柱状图', line: '折线图', pie: '饼图', scatter: '散点图', radar: '雷达图', funnel: '漏斗图', auto: '自动推荐' };
-                    const parts = [`生成 <b>${chartTypes[args.chart_type] || args.chart_type || '自动推荐'}</b>`];
-                    if (args.title) parts.push(`标题: ${args.title}`);
-                    if (args.x_column) parts.push(`X轴: ${args.x_column}`);
-                    if (args.y_column) parts.push(`Y轴: ${args.y_column}`);
-                    if (args.group_by) parts.push(`分组: ${args.group_by}`);
+                    const chartTypes = { bar: 'Bar Chart', line: 'Line Chart', pie: 'Pie Chart', scatter: 'Scatter Plot', radar: 'Radar Chart', funnel: 'Funnel Chart', auto: 'Auto Recommend' };
+                    const parts = [`Generate <b>${chartTypes[args.chart_type] || args.chart_type || 'Auto Recommend'}</b>`];
+                    if (args.title) parts.push(`Title: ${args.title}`);
+                    if (args.x_column) parts.push(`X-axis: ${args.x_column}`);
+                    if (args.y_column) parts.push(`Y-axis: ${args.y_column}`);
+                    if (args.group_by) parts.push(`Group by: ${args.group_by}`);
                     return parts.join(', ');
                 }
                 default:
@@ -2776,18 +2776,18 @@
             }
         }
 
-        // 格式化筛选条件为自然语言
+        // Format filter conditions as natural language
         function formatCondition(column, operator, value) {
             const opNames = {
-                '==': '等于',
-                '!=': '不等于',
-                '>': '大于',
-                '<': '小于',
-                '>=': '大于等于',
-                '<=': '小于等于',
-                'contains': '包含',
-                'startswith': '开头是',
-                'endswith': '结尾是'
+                '==': 'equals',
+                '!=': 'not equals',
+                '>': 'greater than',
+                '<': 'less than',
+                '>=': 'greater than or equal to',
+                '<=': 'less than or equal to',
+                'contains': 'contains',
+                'startswith': 'starts with',
+                'endswith': 'ends with'
             };
             return `<b>${column}</b> ${opNames[operator] || operator} <b>${value}</b>`;
         }
@@ -2799,36 +2799,36 @@
             resultDiv.className = `tool-result ${isError ? 'error' : 'success'}${hasChart ? ' has-chart' : ''}`;
 
             if (isError) {
-                resultDiv.innerHTML = `<strong>❌ 错误:</strong> ${result.error}`;
+                resultDiv.innerHTML = `<strong>❌ Error:</strong> ${result.error}`;
             } else {
-                // 生成友好的结果描述
+                // Generate friendly result description
                 resultDiv.innerHTML = formatToolResult(result);
             }
             toolBlock.appendChild(resultDiv);
         }
 
-        // 将工具结果转换为友好格式
+        // Convert tool results to friendly format
         function formatToolResult(result) {
             if (!result || typeof result !== 'object') {
-                return `<strong>✓ 结果:</strong> ${result}`;
+                return `<strong>✓ Result:</strong> ${result}`;
             }
 
-            // 处理图表结果
+            // Handle chart results
             if (result.chart) {
                 const chartId = 'echart-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
                 const chartHtml = `
                     <div class="chart-result-container">
-                        <div class="chart-header"><strong>📊 ${result.message || '图表已生成'}</strong></div>
+                        <div class="chart-header"><strong>📊 ${result.message || 'Chart generated'}</strong></div>
                         <div class="chart-container" id="${chartId}"></div>
                     </div>
                 `;
-                // 延迟渲染图表，确保 DOM 已插入
+                // Delay chart rendering to ensure DOM is inserted
                 setTimeout(() => {
                     const container = document.getElementById(chartId);
                     if (container && typeof echarts !== 'undefined') {
                         const chart = echarts.init(container, 'dark');
                         chart.setOption(result.chart);
-                        // 响应式调整
+                        // Responsive resize
                         const resizeObserver = new ResizeObserver(() => chart.resize());
                         resizeObserver.observe(container);
                     }
@@ -2836,73 +2836,73 @@
                 return chartHtml;
             }
 
-            const parts = ['<strong>✓ 执行成功</strong>'];
+            const parts = ['<strong>✓ Success</strong>'];
 
-            // 处理聚合结果
+            // Handle aggregation results
             if (result.result !== undefined && result.column && result.function) {
-                const funcNames = { sum: '总和', mean: '平均值', count: '数量', min: '最小值', max: '最大值', median: '中位数', std: '标准差' };
-                parts.push(`<b>${result.column}</b> 的${funcNames[result.function] || result.function}: <span class="result-value">${formatNumber(result.result)}</span>`);
+                const funcNames = { sum: 'Sum', mean: 'Mean', count: 'Count', min: 'Min', max: 'Max', median: 'Median', std: 'Std Dev' };
+                parts.push(`${funcNames[result.function] || result.function} of <b>${result.column}</b>: <span class="result-value">${formatNumber(result.result)}</span>`);
                 if (result.filtered_rows) {
-                    parts.push(`<span class="result-meta">(基于 ${result.filtered_rows} 条数据)</span>`);
+                    parts.push(`<span class="result-meta">(based on ${result.filtered_rows} rows)</span>`);
                 }
                 return parts.join(' ');
             }
 
-            // 处理时间结果
+            // Handle time results
             if (result.current_time) {
-                return `<strong>✓ 当前时间:</strong> <span class="result-value">${result.current_time}</span> (${result.weekday || ''})`;
+                return `<strong>✓ Current time:</strong> <span class="result-value">${result.current_time}</span> (${result.weekday || ''})`;
             }
 
-            // 处理计算结果
+            // Handle calculation results
             if (result.results && typeof result.results === 'object') {
-                const calcParts = ['<strong>✓ 计算结果:</strong><br>'];
+                const calcParts = ['<strong>✓ Calculation results:</strong><br>'];
                 for (const [expr, val] of Object.entries(result.results)) {
                     calcParts.push(`<code>${expr}</code> = <span class="result-value">${formatNumber(val)}</span><br>`);
                 }
                 return calcParts.join('');
             }
 
-            // 处理数据列表结果
+            // Handle data list results
             if (result.data && Array.isArray(result.data)) {
-                const summary = [`<strong>✓ 查询到 ${result.total_rows || result.data.length} 条数据</strong>`];
+                const summary = [`<strong>✓ Found ${result.total_rows || result.data.length} rows</strong>`];
                 if (result.returned_rows && result.returned_rows < result.total_rows) {
-                    summary.push(`<span class="result-meta">(显示前 ${result.returned_rows} 条)</span>`);
+                    summary.push(`<span class="result-meta">(showing first ${result.returned_rows} rows)</span>`);
                 }
                 if (result.columns) {
-                    summary.push(`<br><span class="result-meta">包含列: ${result.columns.join(', ')}</span>`);
+                    summary.push(`<br><span class="result-meta">Columns: ${result.columns.join(', ')}</span>`);
                 }
-                // 显示前几条数据的简要预览
+                // Show preview of first few rows
                 if (result.data.length > 0) {
                     const preview = result.data.slice(0, 3);
-                    summary.push('<details class="result-data-preview"><summary>查看数据预览</summary><pre>' + JSON.stringify(preview, null, 2) + '</pre></details>');
+                    summary.push('<details class="result-data-preview"><summary>View data preview</summary><pre>' + JSON.stringify(preview, null, 2) + '</pre></details>');
                 }
                 return summary.join(' ');
             }
 
-            // 处理统计信息
+            // Handle statistics
             if (result.column && (result.count !== undefined || result.unique_count !== undefined)) {
-                const statParts = [`<strong>✓ ${result.column} 列统计:</strong><br>`];
-                if (result.count !== undefined) statParts.push(`总数: <b>${result.count}</b> `);
-                if (result.unique_count !== undefined) statParts.push(`唯一值: <b>${result.unique_count}</b> `);
-                if (result.null_count !== undefined) statParts.push(`空值: <b>${result.null_count}</b><br>`);
-                if (result.min !== undefined) statParts.push(`最小: <b>${formatNumber(result.min)}</b> `);
-                if (result.max !== undefined) statParts.push(`最大: <b>${formatNumber(result.max)}</b> `);
-                if (result.mean !== undefined) statParts.push(`平均: <b>${formatNumber(result.mean)}</b>`);
+                const statParts = [`<strong>✓ Statistics for ${result.column}:</strong><br>`];
+                if (result.count !== undefined) statParts.push(`Count: <b>${result.count}</b> `);
+                if (result.unique_count !== undefined) statParts.push(`Unique: <b>${result.unique_count}</b> `);
+                if (result.null_count !== undefined) statParts.push(`Null: <b>${result.null_count}</b><br>`);
+                if (result.min !== undefined) statParts.push(`Min: <b>${formatNumber(result.min)}</b> `);
+                if (result.max !== undefined) statParts.push(`Max: <b>${formatNumber(result.max)}</b> `);
+                if (result.mean !== undefined) statParts.push(`Mean: <b>${formatNumber(result.mean)}</b>`);
                 return statParts.join('');
             }
 
-            // 处理唯一值结果
+            // Handle unique values results
             if (result.values && Array.isArray(result.values)) {
-                const valueParts = [`<strong>✓ ${result.column} 列有 ${result.total_unique} 个唯一值</strong>`];
+                const valueParts = [`<strong>✓ ${result.column} has ${result.total_unique} unique values</strong>`];
                 if (result.values.length > 0) {
                     const topValues = result.values.slice(0, 5).map(v => `${v.value} (${v.count})`).join(', ');
-                    valueParts.push(`<br><span class="result-meta">前几个: ${topValues}${result.values.length > 5 ? '...' : ''}</span>`);
+                    valueParts.push(`<br><span class="result-meta">Top values: ${topValues}${result.values.length > 5 ? '...' : ''}</span>`);
                 }
                 return valueParts.join('');
             }
 
-            // 默认：紧凑显示 JSON
-            return `<strong>✓ 结果:</strong><details><summary>查看详情</summary><pre>${JSON.stringify(result, null, 2)}</pre></details>`;
+            // Default: compact JSON display
+            return `<strong>✓ Result:</strong><details><summary>View details</summary><pre>${JSON.stringify(result, null, 2)}</pre></details>`;
         }
 
         // 格式化数字
@@ -2980,7 +2980,7 @@
             });
 
             if (validFiles.length === 0) {
-                alert('仅支持 .md, .txt, .markdown 文件');
+                alert('Only .md, .txt, .markdown files are supported');
                 return;
             }
 
@@ -2995,13 +2995,13 @@
             formData.append('file', file);
             try {
                 const response = await fetch('/knowledge/upload', { method: 'POST', body: formData });
-                if (!response.ok) throw new Error((await response.json()).detail || '上传失败');
+                if (!response.ok) throw new Error((await response.json()).detail || 'Upload failed');
                 const data = await response.json();
                 if (data.success) {
-                    console.log('知识文件上传成功:', data.title);
+                    console.log('Knowledge file uploaded successfully:', data.title);
                 }
             } catch (error) {
-                alert('上传失败: ' + error.message);
+                alert('Upload failed: ' + error.message);
             }
         }
 
@@ -3014,7 +3014,7 @@
                     renderKnowledgeList();
                 }
             } catch (error) {
-                console.error('加载知识库失败:', error);
+                console.error('Failed to load knowledge base:', error);
             }
         }
 
@@ -3022,16 +3022,16 @@
             kbCount.textContent = knowledgeEntries.length;
 
             if (knowledgeEntries.length === 0) {
-                kbList.innerHTML = '<div class="knowledge-empty">暂无知识条目</div>';
+                kbList.innerHTML = '<div class="knowledge-empty">No knowledge entries available</div>';
                 return;
             }
 
             kbList.innerHTML = knowledgeEntries.map(entry => {
                 const categoryLabel = {
-                    'general': '通用',
-                    'field_rule': '字段',
-                    'task_pattern': '任务',
-                    'business_logic': '业务'
+                    'general': 'General',
+                    'field_rule': 'Field',
+                    'task_pattern': 'Task',
+                    'business_logic': 'Business'
                 }[entry.category] || entry.category;
 
                 const tagsHtml = (entry.tags || [])
@@ -3044,11 +3044,11 @@
                     <div class="knowledge-item" data-id="${entry.id}" onclick="viewKnowledgeEntry('${entry.id}')">
                         <span class="knowledge-icon">📄</span>
                         <div class="knowledge-info">
-                            <div class="knowledge-name">${entry.title || '未命名'}</div>
+                            <div class="knowledge-name">${entry.title || 'Untitled'}</div>
                             <div class="knowledge-meta">${categoryLabel}</div>
                             ${tagsHtml ? `<div class="knowledge-tags">${tagsHtml}</div>` : ''}
                         </div>
-                        <button class="knowledge-delete" onclick="event.stopPropagation(); deleteKnowledgeEntry('${entry.id}')" title="删除">×</button>
+                        <button class="knowledge-delete" onclick="event.stopPropagation(); deleteKnowledgeEntry('${entry.id}')" title="Delete">×</button>
                     </div>
                 `;
             }).join('');
@@ -3057,11 +3057,11 @@
         async function viewKnowledgeEntry(id) {
             try {
                 const response = await fetch(`/knowledge/${id}`);
-                if (!response.ok) throw new Error('获取失败');
+                if (!response.ok) throw new Error('Failed to fetch');
                 const entry = await response.json();
 
                 currentKbEditId = id;
-                kbModalTitle.textContent = '📝 编辑知识';
+                kbModalTitle.textContent = '📝 Edit Knowledge';
                 kbTitleInput.value = entry.title || '';
                 kbContentInput.value = entry.content || '';
                 kbCategorySelect.value = entry.category || 'general';
@@ -3070,13 +3070,13 @@
 
                 kbModal.classList.add('show');
             } catch (error) {
-                alert('获取知识详情失败: ' + error.message);
+                alert('Failed to get knowledge details: ' + error.message);
             }
         }
 
         function openKbModal() {
             currentKbEditId = null;
-            kbModalTitle.textContent = '📚 添加知识';
+            kbModalTitle.textContent = '📚 Add Knowledge';
             kbTitleInput.value = '';
             kbContentInput.value = '';
             kbCategorySelect.value = 'general';
@@ -3093,7 +3093,7 @@
         async function saveKnowledgeEntry() {
             const content = kbContentInput.value.trim();
             if (!content) {
-                alert('请输入知识内容');
+                alert('Please enter knowledge content');
                 return;
             }
 
@@ -3124,24 +3124,24 @@
                     });
                 }
 
-                if (!response.ok) throw new Error((await response.json()).detail || '保存失败');
+                if (!response.ok) throw new Error((await response.json()).detail || 'Save failed');
 
                 closeKbModal();
                 loadKnowledgeEntries();
             } catch (error) {
-                alert('保存失败: ' + error.message);
+                alert('Save failed: ' + error.message);
             }
         }
 
         async function deleteKnowledgeEntry(id) {
-            if (!confirm('确定删除此知识条目？')) return;
+            if (!confirm('Are you sure you want to delete this knowledge entry?')) return;
 
             try {
                 const response = await fetch(`/knowledge/${id}`, { method: 'DELETE' });
-                if (!response.ok) throw new Error((await response.json()).detail || '删除失败');
+                if (!response.ok) throw new Error((await response.json()).detail || 'Delete failed');
                 loadKnowledgeEntries();
             } catch (error) {
-                alert('删除失败: ' + error.message);
+                alert('Delete failed: ' + error.message);
             }
         }
 
