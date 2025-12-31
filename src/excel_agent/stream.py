@@ -2,44 +2,16 @@
 
 import json
 import re
-from typing import Any, AsyncGenerator, Dict
+from typing import Any, AsyncGenerator, Dict, Optional
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
-from langchain_openai import ChatOpenAI
 
-from .config import get_config
+from .domain.ports import LLMFactory, ToolRegistry
 from .excel_loader import get_loader
 from .knowledge_base import get_knowledge_base, format_knowledge_context
 from .language import detect_target_language, is_language_mismatch, language_label, localize, rewrite_system_prompt
-
 from .tools import ALL_TOOLS
-
-
-class CustomJSONEncoder(json.JSONEncoder):
-    """自定义 JSON 编码器，处理 Pandas/Numpy 类型"""
-    
-    def default(self, obj):
-        # 处理 Pandas Timestamp
-        if hasattr(obj, 'isoformat'):
-            return obj.isoformat()
-        # 处理 numpy 类型
-        if hasattr(obj, 'item'):
-            return obj.item()
-        # 处理 numpy 数组
-        if hasattr(obj, 'tolist'):
-            return obj.tolist()
-        # 处理 pandas NaT
-        if str(obj) == 'NaT':
-            return None
-        # 处理 pandas NA
-        if str(obj) == '<NA>':
-            return None
-        return super().default(obj)
-
-
-def json_dumps(obj, **kwargs):
-    """使用自定义编码器的 JSON 序列化函数"""
-    return json.dumps(obj, cls=CustomJSONEncoder, **kwargs)
+from .utils import json_dumps
 
 
 # 构建工具描述
@@ -137,29 +109,29 @@ You MAY quote column names or cell values in their original language, but the su
 {tools_description}
 
 ## Working Principles
-1. Based on user questions, determine if tools are needed
-2. If tools needed, **only output** tool call JSON, **strictly prohibit** any other text, thinking process, or explanation
-3. After successful tool call, answer user questions based on results
-4. **In final answer, directly provide conclusions and analysis**, do not describe "I used xx tool" or "I performed xx operation" or other internal processes
-5. Maintain friendly tone and provide data analysis recommendations
-6. If there is related knowledge reference, follow the rules and suggestions within
+1. **CRITICAL: The Excel data is ALREADY LOADED and accessible via tools. NEVER ask the user to provide data, column sums, or any information that can be obtained through tools.**
+2. **When the user asks for data across multiple columns (e.g., "monthly totals", "all months"), you MUST call the tool multiple times (once per column) to gather ALL the required data before responding.**
+3. Based on user questions, determine if tools are needed
+4. If tools needed, **immediately call the appropriate tool** and **only output** tool call JSON, **strictly prohibit** any other text, thinking process, or explanation
+5. After successful tool call, if you need more data from other columns, **immediately call the tool again** for the next column
+6. After gathering ALL required data, answer user questions based on complete results
+7. **In final answer, directly provide conclusions and analysis**, do not describe "I used xx tool" or "I performed xx operation" or other internal processes
+8. **ALWAYS use tools to retrieve data instead of asking the user for it**
+9. Maintain friendly tone and provide data analysis recommendations
+10. If there is related knowledge reference, follow the rules and suggestions within
 """
 
 
 
 
 
-def get_llm():
-    """获取 LLM 实例"""
-    config = get_config()
-    provider = config.model.get_active_provider()
-    return ChatOpenAI(
-        model=provider.model_name,
-        api_key=provider.api_key,
-        base_url=provider.base_url if provider.base_url else None,
-        temperature=provider.temperature,
-        max_tokens=provider.max_tokens,
-    )
+def get_llm(llm_factory: Optional[LLMFactory] = None):
+    """获取 LLM 实例（支持 DI 注入）"""
+    if llm_factory is not None:
+        return llm_factory.create_chat_model()
+    # 向后兼容：使用容器
+    from .core import get_container
+    return get_container().get_llm_factory().create_chat_model()
 
 
 def parse_tool_call(text: str) -> Dict[str, Any] | None:
@@ -217,8 +189,11 @@ def parse_tool_call(text: str) -> Dict[str, Any] | None:
     return None
 
 
-def execute_tool(tool_name: str, tool_args: dict) -> dict:
-    """执行工具调用"""
+def execute_tool(tool_name: str, tool_args: dict, tool_registry: Optional[ToolRegistry] = None) -> dict:
+    """执行工具调用（支持 DI 注入）"""
+    if tool_registry is not None:
+        return tool_registry.execute(tool_name, tool_args)
+    # 向后兼容：使用全局工具列表
     for tool in ALL_TOOLS:
         if tool.name == tool_name:
             try:
@@ -305,8 +280,8 @@ async def stream_chat(message: str, history: list = None) -> AsyncGenerator[Dict
             target_language, en="Unknown table", zh="未知表"
         )
         
-        # 添加历史对话（包含表名标记）- 临时禁用，每次对话只关注本次
-        if False:  # 原为 if history:
+        # 添加历史对话（包含表名标记）
+        if history:
             for h in history:
                 content = h.get("content", "")
                 table_name = h.get("tableName", "")
